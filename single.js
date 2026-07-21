@@ -8,9 +8,18 @@ class SinglePlayerGame {
         this.runner = null;
 
         // Configuration
-        this.LOGIC_W = 1290; // Background image expected width
-        this.LOGIC_H = 1092; // Background image expected height
-        this.SCALE = 0.6; // Scale down for display
+        this.mobileMode = (window.innerWidth <= 1200);
+        
+        if (this.mobileMode) {
+            this.LOGIC_OFFSET_X = 527; 
+            this.LOGIC_W = 760; // 527 to 1287 (box is 560 to 1254)
+        } else {
+            this.LOGIC_OFFSET_X = 0;
+            this.LOGIC_W = 1290;
+        }
+        
+        this.LOGIC_H = 1092; 
+        this.SCALE = 0.6; 
 
         this.canvas.width = this.LOGIC_W * this.SCALE;
         this.canvas.height = this.LOGIC_H * this.SCALE;
@@ -77,17 +86,15 @@ class SinglePlayerGame {
         this.handleMouseMove = (e) => {
             if(this.gameOver) return;
             const rect = this.canvas.getBoundingClientRect();
-            const mouseX = (e.clientX - rect.left) / this.SCALE;
-            // Bound mouse movement so dropX (mouseX - 45) doesn't hit walls (540, 1274)
-            // min: 540 + 35 + 45 = 620
-            // max: 1274 - 35 + 45 = 1284
+            const mouseX = ((e.clientX - rect.left) / rect.width) * this.LOGIC_W + this.LOGIC_OFFSET_X;
+            // Bound mouse movement so dropX (mouseX - 45) doesn't hit walls
             this.playerX = Math.max(620, Math.min(1284, mouseX));
         };
 
         this.handleMouseClick = (e) => {
             const rect = this.canvas.getBoundingClientRect();
-            const mouseX = (e.clientX - rect.left) / this.SCALE;
-            const mouseY = (e.clientY - rect.top) / this.SCALE;
+            const mouseX = ((e.clientX - rect.left) / rect.width) * this.LOGIC_W + this.LOGIC_OFFSET_X;
+            const mouseY = ((e.clientY - rect.top) / rect.height) * this.LOGIC_H;
 
             if(this.gameOver) {
                 // Restart button bounds: 730 <= x <= 1115 and 786 <= y <= 886
@@ -298,6 +305,31 @@ class SinglePlayerGame {
     }
 
     drawUI(ctx) {
+        if (this.mobileMode) {
+            // モバイル用簡易表示
+            ctx.font = "bold 40px Meiryo, sans-serif";
+            ctx.textAlign = "center";
+            ctx.fillStyle = "white";
+            ctx.strokeStyle = "rgba(100,50,0,0.5)";
+            ctx.lineWidth = 6;
+            
+            const centerX = 907; // (560 + 1254) / 2
+            const topY = 100;
+            
+            ctx.strokeText("SCORE: " + this.score, centerX, topY);
+            ctx.fillText("SCORE: " + this.score, centerX, topY);
+
+            const nextImg = ASSETS[FRUITS[this.nextNextFruitIdx].src];
+            if(nextImg) {
+                const drawW = nextImg.width / 5;
+                const drawH = nextImg.height / 5;
+                ctx.drawImage(nextImg, centerX + 180, topY - 40, drawW, drawH);
+                ctx.strokeText("NEXT:", 907 + 110, topY);
+                ctx.fillText("NEXT:", 907 + 110, topY);
+            }
+            return;
+        }
+
         const elapsedSway = Date.now() / 1000;
         const offsetY1 = 6 * Math.sin(3 * elapsedSway);
         const offsetY2 = 6 * Math.sin(3 * elapsedSway + Math.PI);
@@ -470,6 +502,7 @@ class SinglePlayerGame {
         const ctx = this.ctx;
         ctx.save();
         ctx.scale(this.SCALE, this.SCALE);
+        ctx.translate(-this.LOGIC_OFFSET_X, 0);
 
         // Draw background
         const season = window.bgSeason || 'spring';
