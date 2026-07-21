@@ -105,8 +105,32 @@ class SinglePlayerGame {
             }
         };
 
+        this.handleTouchMove = (e) => {
+            if(e.touches.length > 0) {
+                e.preventDefault(); // prevent scrolling
+                this.handleMouseMove({
+                    clientX: e.touches[0].clientX,
+                    clientY: e.touches[0].clientY
+                });
+            }
+        };
+
+        this.handleTouchStart = (e) => {
+            if(e.touches.length > 0) {
+                e.preventDefault(); // prevent scrolling
+                const simulatedEvent = {
+                    clientX: e.touches[0].clientX,
+                    clientY: e.touches[0].clientY
+                };
+                this.handleMouseMove(simulatedEvent);
+                this.handleMouseClick(simulatedEvent);
+            }
+        };
+
         this.canvas.addEventListener('mousemove', this.handleMouseMove);
         this.canvas.addEventListener('mousedown', this.handleMouseClick);
+        this.canvas.addEventListener('touchmove', this.handleTouchMove, {passive: false});
+        this.canvas.addEventListener('touchstart', this.handleTouchStart, {passive: false});
 
         // Collision logic
         Events.on(this.engine, 'collisionStart', (event) => {
@@ -225,7 +249,8 @@ class SinglePlayerGame {
         localStorage.setItem('suika_ranking', JSON.stringify(this.ranking));
 
         this.canvas.removeEventListener('mousemove', this.handleMouseMove);
-        // keep mouse down listener for restart
+        if (this.handleTouchMove) this.canvas.removeEventListener('touchmove', this.handleTouchMove);
+        // keep mouse down / touch start listener for restart
     }
 
     start() {
@@ -240,6 +265,8 @@ class SinglePlayerGame {
         Engine.clear(this.engine);
         this.canvas.removeEventListener('mousemove', this.handleMouseMove);
         this.canvas.removeEventListener('mousedown', this.handleMouseClick);
+        if (this.handleTouchMove) this.canvas.removeEventListener('touchmove', this.handleTouchMove);
+        if (this.handleTouchStart) this.canvas.removeEventListener('touchstart', this.handleTouchStart);
     }
 
     update() {
