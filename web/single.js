@@ -10,17 +10,19 @@ class SinglePlayerGame {
         this.mobileMode = (window.innerWidth <= 1200);
         
         if (this.mobileMode) {
-            this.LOGIC_OFFSET_X = 527; 
-            // スマホでは常に横幅を箱に合わせる(拡大)
-            this.LOGIC_W = 760; 
-            const aspect = window.innerHeight / window.innerWidth;
+            // スマホでは常に箱の幅(694)を画面の横幅(100%)に合わせる
+            this.LOGIC_W = 694; 
+            
+            // #game-containerの実際のサイズを取得して正確なアスペクト比を計算
+            const container = this.canvas.parentElement;
+            const aspect = container.clientHeight / container.clientWidth;
             this.LOGIC_H = this.LOGIC_W * aspect;
             
-            // Xオフセット: 箱(幅694, 560~1254)が中央になるように
-            this.LOGIC_OFFSET_X = 560 - (this.LOGIC_W - 694) / 2;
+            // Xオフセット: 箱の左端(560)から描画を開始する
+            this.LOGIC_OFFSET_X = 560;
             
-            // Yオフセット: 床(Y=1182)が画面の下端(10pxのゆとり)になるように配置
-            this.LOGIC_OFFSET_Y = this.LOGIC_H - 10 - 1182; 
+            // Yオフセット: 床(Y=1182)が画面の下端から20px上になるように配置
+            this.LOGIC_OFFSET_Y = this.LOGIC_H - 20 - 1182; 
         } else {
             this.LOGIC_OFFSET_X = 0;
             this.LOGIC_OFFSET_Y = 0;
@@ -28,7 +30,8 @@ class SinglePlayerGame {
             this.LOGIC_H = 1092;
         }
         
-        this.SCALE = 0.6; 
+        // モバイルでは解像度を上げてぼやけを防ぐ
+        this.SCALE = this.mobileMode ? 1.5 : 0.6; 
 
         this.canvas.width = this.LOGIC_W * this.SCALE;
         this.canvas.height = this.LOGIC_H * this.SCALE;
@@ -322,8 +325,8 @@ class SinglePlayerGame {
             
             // 常に画面の上端から一定の距離(50px)に表示
             const topY = -(this.LOGIC_OFFSET_Y || 0) + 50; 
-            const leftX = 560; // 箱の左端
-            const rightX = 1254; // 箱の右端
+            const leftX = 560 + 10; // 箱の左端 + 少しの余白
+            const rightX = 1254 - 10; // 箱の右端 - 少しの余白
             
             // スコアを左上に配置
             ctx.textAlign = "left";
