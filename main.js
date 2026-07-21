@@ -29,6 +29,18 @@ function preloadImages(callback) {
     const toLoad = [
         "img/background.png",
         "img/background2.png",
+        "img/bg_spring_1.png",
+        "img/bg_spring_2.png",
+        "img/bg_spring_3.png",
+        "img/bg_summer_1.png",
+        "img/bg_summer_2.png",
+        "img/bg_summer_3.png",
+        "img/bg_autumn_1.png",
+        "img/bg_autumn_2.png",
+        "img/bg_autumn_3.png",
+        "img/bg_winter_1.png",
+        "img/bg_winter_2.png",
+        "img/bg_winter_3.png",
         "img/00cloud.png",
         "img/player1.png",
         "img/player2.png",
@@ -95,7 +107,15 @@ const SoundManager = {
         const chkSe = document.getElementById('chk-se');
         const volSlider = document.getElementById('vol-slider');
         const chkGuide = document.getElementById('chk-guide');
+        const selBgSeason = document.getElementById('sel-bg-season');
         window.guideEnabled = true;
+        window.bgSeason = 'spring';
+
+        if(selBgSeason) {
+            selBgSeason.addEventListener('change', (e) => {
+                window.bgSeason = e.target.value;
+            });
+        }
 
         if(chkBgm) {
             chkBgm.addEventListener('change', (e) => {

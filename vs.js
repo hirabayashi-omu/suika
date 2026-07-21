@@ -344,8 +344,47 @@ class VSGame {
         ctx.save();
         ctx.scale(this.SCALE, this.SCALE);
 
-        const bg = ASSETS["img/background2.png"];
-        if(bg) ctx.drawImage(bg, 0, 0, this.LOGIC_W, this.LOGIC_H);
+        // Draw background
+        const season = window.bgSeason || 'spring';
+        const bg1 = ASSETS[`img/bg_${season}_1.png`];
+        const bg2 = ASSETS[`img/bg_${season}_2.png`];
+        const bg3 = ASSETS[`img/bg_${season}_3.png`];
+        
+        if (bg1 && bg2 && bg3) {
+            const time = Date.now();
+            const scrollSpeed = 0.03; 
+            const W = 1920;
+            const H = 1080;
+            const totalWidth = W * 6;
+            const offset = (time * scrollSpeed) % totalWidth;
+            
+            const images = [
+                {img: bg1, flip: false}, {img: bg1, flip: true},
+                {img: bg2, flip: false}, {img: bg2, flip: true},
+                {img: bg3, flip: false}, {img: bg3, flip: true}
+            ];
+
+            for(let i = -1; i <= 2; i++) {
+                let tileIndex = Math.floor(offset / W) + i;
+                let drawX = (tileIndex * W) - offset;
+                let wrappedIndex = tileIndex % 6;
+                if (wrappedIndex < 0) wrappedIndex += 6;
+                
+                let item = images[wrappedIndex];
+                if (item.flip) {
+                    ctx.save();
+                    ctx.translate(drawX + W, 0);
+                    ctx.scale(-1, 1);
+                    ctx.drawImage(item.img, 0, 0, W, H);
+                    ctx.restore();
+                } else {
+                    ctx.drawImage(item.img, drawX, 0, W, H);
+                }
+            }
+        } else {
+            const bg = ASSETS["img/background2.png"];
+            if(bg) ctx.drawImage(bg, 0, 0, this.LOGIC_W, this.LOGIC_H);
+        }
 
         const draw3DBox = (minX, maxX, topY, floorY) => {
             const depthX = 40;
