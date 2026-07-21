@@ -15,8 +15,11 @@ class SinglePlayerGame {
             this.LOGIC_W = 771; 
             
             // #game-containerの実際のサイズを取得して正確なアスペクト比を計算
+            // （画面切り替え直後で0になる現象を防ぐためフォールバックを入れる）
             const container = this.canvas.parentElement;
-            const aspect = container.clientHeight / container.clientWidth;
+            const cw = container.clientWidth || window.innerWidth;
+            const ch = container.clientHeight || window.innerHeight;
+            const aspect = ch / cw;
             this.LOGIC_H = this.LOGIC_W * aspect;
             
             // Xオフセット: 箱が中央になるように配置 (560 - (771-694)/2 = 521.5)
