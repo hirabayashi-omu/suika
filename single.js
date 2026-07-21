@@ -10,16 +10,17 @@ class SinglePlayerGame {
         this.mobileMode = (window.innerWidth <= 1200);
         
         if (this.mobileMode) {
-            // スマホでは常に箱の幅(694)を画面の横幅(100%)に合わせる
-            this.LOGIC_W = 694; 
+            // スマホでは箱の幅(694)が画面の横幅の90%になるように全体サイズを調整
+            // 694 / 0.9 = 771.1... なので LOGIC_W = 771 とする
+            this.LOGIC_W = 771; 
             
             // #game-containerの実際のサイズを取得して正確なアスペクト比を計算
             const container = this.canvas.parentElement;
             const aspect = container.clientHeight / container.clientWidth;
             this.LOGIC_H = this.LOGIC_W * aspect;
             
-            // Xオフセット: 箱の左端(560)から描画を開始する
-            this.LOGIC_OFFSET_X = 560;
+            // Xオフセット: 箱が中央になるように配置 (560 - (771-694)/2 = 521.5)
+            this.LOGIC_OFFSET_X = 521.5;
             
             // Yオフセット: 床(Y=1182)が画面の下端から20px上になるように配置
             this.LOGIC_OFFSET_Y = this.LOGIC_H - 20 - 1182; 
