@@ -16,10 +16,20 @@ class SinglePlayerGame {
             const aspect = window.innerHeight / window.innerWidth;
             this.LOGIC_H = this.LOGIC_W * aspect;
             
-            // 箱の高さは約932 (250〜1182)。画面中央になるようにYオフセットを計算
-            const boxH = 932;
-            const topPadding = (this.LOGIC_H - boxH) / 2;
-            this.LOGIC_OFFSET_Y = topPadding - 250; 
+            // 箱の上部（テキストや雲）と下部（床）を含め、最低限必要な高さを1310とする
+            const minH = 1310;
+            if (this.LOGIC_H < minH) {
+                this.LOGIC_H = minH;
+                this.LOGIC_W = this.LOGIC_H / aspect;
+            }
+            
+            // 箱(幅694, 560~1254)が横方向の中央になるようにXオフセットを計算
+            this.LOGIC_OFFSET_X = 560 - (this.LOGIC_W - 694) / 2;
+            
+            // 縦方向の配置：Y=-80 から Y=1230 までが中央に収まるようにYオフセットを計算
+            const contentH = 1310;
+            const extraY = (this.LOGIC_H - contentH) / 2;
+            this.LOGIC_OFFSET_Y = 80 + extraY; 
         } else {
             this.LOGIC_OFFSET_X = 0;
             this.LOGIC_OFFSET_Y = 0;
@@ -319,8 +329,8 @@ class SinglePlayerGame {
             ctx.strokeStyle = "rgba(100,50,0,0.5)";
             ctx.lineWidth = 6;
             
-            // 箱の上端 (250) よりさらに上の空きスペースに配置
-            const topY = 160; 
+            // 箱の上端(250)や雲(60付近)よりもさらに上の空きスペースに配置
+            const topY = -20; 
             const leftX = 560; // 箱の左端
             const rightX = 1254; // 箱の右端
             
