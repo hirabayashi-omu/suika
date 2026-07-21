@@ -11,25 +11,16 @@ class SinglePlayerGame {
         
         if (this.mobileMode) {
             this.LOGIC_OFFSET_X = 527; 
+            // スマホでは常に横幅を箱に合わせる(拡大)
             this.LOGIC_W = 760; 
-            // 画面の縦横比に合わせてLOGIC_Hを決定し、画面いっぱいに表示
             const aspect = window.innerHeight / window.innerWidth;
             this.LOGIC_H = this.LOGIC_W * aspect;
             
-            // 箱の上部（テキストや雲）と下部（床）を含め、最低限必要な高さを1310とする
-            const minH = 1310;
-            if (this.LOGIC_H < minH) {
-                this.LOGIC_H = minH;
-                this.LOGIC_W = this.LOGIC_H / aspect;
-            }
-            
-            // 箱(幅694, 560~1254)が横方向の中央になるようにXオフセットを計算
+            // Xオフセット: 箱(幅694, 560~1254)が中央になるように
             this.LOGIC_OFFSET_X = 560 - (this.LOGIC_W - 694) / 2;
             
-            // 縦方向の配置：Y=-80 から Y=1230 までが中央に収まるようにYオフセットを計算
-            const contentH = 1310;
-            const extraY = (this.LOGIC_H - contentH) / 2;
-            this.LOGIC_OFFSET_Y = 80 + extraY; 
+            // Yオフセット: 床(Y=1182)が画面の下端(10pxのゆとり)になるように配置
+            this.LOGIC_OFFSET_Y = this.LOGIC_H - 10 - 1182; 
         } else {
             this.LOGIC_OFFSET_X = 0;
             this.LOGIC_OFFSET_Y = 0;
@@ -329,8 +320,8 @@ class SinglePlayerGame {
             ctx.strokeStyle = "rgba(100,50,0,0.5)";
             ctx.lineWidth = 6;
             
-            // 箱の上端(250)や雲(60付近)よりもさらに上の空きスペースに配置
-            const topY = -20; 
+            // 常に画面の上端から一定の距離(50px)に表示
+            const topY = -(this.LOGIC_OFFSET_Y || 0) + 50; 
             const leftX = 560; // 箱の左端
             const rightX = 1254; // 箱の右端
             
