@@ -22,8 +22,8 @@ class SinglePlayerGame {
             // Xオフセット: 箱が中央になるように配置 (560 - (771-694)/2 = 521.5)
             this.LOGIC_OFFSET_X = 521.5;
             
-            // Yオフセット: 床(Y=1182)が画面の下端から20px上になるように配置
-            this.LOGIC_OFFSET_Y = this.LOGIC_H - 20 - 1182; 
+            // Yオフセット: 床(Y=1182)が画面の下端から60px上になるように配置（少し上に移動）
+            this.LOGIC_OFFSET_Y = this.LOGIC_H - 60 - 1182; 
         } else {
             this.LOGIC_OFFSET_X = 0;
             this.LOGIC_OFFSET_Y = 0;
