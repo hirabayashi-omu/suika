@@ -115,6 +115,8 @@ class SinglePlayerGame {
             }
         };
 
+        let lastTapTime = 0;
+
         this.handleTouchStart = (e) => {
             if(e.touches.length > 0) {
                 e.preventDefault(); // prevent scrolling
@@ -122,8 +124,24 @@ class SinglePlayerGame {
                     clientX: e.touches[0].clientX,
                     clientY: e.touches[0].clientY
                 };
+                
+                // ゲームオーバー時のリスタートボタンはシングルタップで反応させる
+                if (this.gameOver) {
+                    this.handleMouseClick(simulatedEvent);
+                    return;
+                }
+
+                // スライド移動のための座標更新
                 this.handleMouseMove(simulatedEvent);
-                this.handleMouseClick(simulatedEvent);
+                
+                // ダブルタップ判定 (300ms以内にもう一度タップされたら落下)
+                const now = Date.now();
+                if (now - lastTapTime < 300) {
+                    this.handleMouseClick(simulatedEvent);
+                    lastTapTime = 0; // リセット
+                } else {
+                    lastTapTime = now;
+                }
             }
         };
 
