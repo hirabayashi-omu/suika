@@ -318,15 +318,15 @@ class SinglePlayerGame {
 
     drawUI(ctx) {
         if (this.mobileMode) {
-            ctx.font = "bold 38px Meiryo, sans-serif";
+            ctx.font = "bold 26px Meiryo, sans-serif";
             ctx.fillStyle = "white";
             ctx.strokeStyle = "rgba(100,50,0,0.5)";
-            ctx.lineWidth = 6;
+            ctx.lineWidth = 4;
             
-            // 常に画面の上端から一定の距離(50px)に表示
-            const topY = -(this.LOGIC_OFFSET_Y || 0) + 50; 
-            const leftX = 560 + 10; // 箱の左端 + 少しの余白
-            const rightX = 1254 - 10; // 箱の右端 - 少しの余白
+            // 戻るボタン(top:20px, height:約40px)を避けるため、少し下に配置
+            const topY = -(this.LOGIC_OFFSET_Y || 0) + 80; 
+            const leftX = 560 + 10; // 箱の左端 + 余白
+            const rightX = 1254 - 10; // 箱の右端 - 余白
             
             // スコアを左上に配置
             ctx.textAlign = "left";
@@ -337,13 +337,13 @@ class SinglePlayerGame {
             ctx.textAlign = "right";
             const nextImg = ASSETS[FRUITS[this.nextNextFruitIdx].src];
             if(nextImg) {
-                const drawW = nextImg.width / 5;
-                const drawH = nextImg.height / 5;
-                // 右端に画像、その左に「NEXT:」テキスト
-                ctx.strokeText("NEXT:", rightX - drawW - 10, topY);
-                ctx.fillText("NEXT:", rightX - drawW - 10, topY);
-                ctx.drawImage(nextImg, rightX - drawW, topY - 35, drawW, drawH);
+                // フルーツ画像も少し小さめに
+                const drawW = nextImg.width / 7;
+                const drawH = nextImg.height / 7;
+                ctx.drawImage(nextImg, rightX - 60, topY - 20, drawW, drawH);
             }
+            ctx.strokeText("NEXT:", rightX - 70, topY);
+            ctx.fillText("NEXT:", rightX - 70, topY);
             return;
         }
 
