@@ -123,6 +123,17 @@ h1 {
     #btn-vs {
         display: none !important;
     }
+    #game-container {
+        width: 100vw !important;
+        height: 100vh !important;
+    }
+    canvas {
+        width: 100vw !important;
+        height: 100vh !important;
+        max-width: none !important;
+        max-height: none !important;
+        object-fit: cover !important;
+    }
 }
 
 .hidden {
