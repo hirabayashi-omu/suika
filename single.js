@@ -7,18 +7,26 @@ class SinglePlayerGame {
         this.world = this.engine.world;
         this.runner = null;
 
-        // Configuration
         this.mobileMode = (window.innerWidth <= 1200);
         
         if (this.mobileMode) {
             this.LOGIC_OFFSET_X = 527; 
-            this.LOGIC_W = 760; // 527 to 1287 (box is 560 to 1254)
+            this.LOGIC_W = 760; 
+            // 画面の縦横比に合わせてLOGIC_Hを決定し、画面いっぱいに表示
+            const aspect = window.innerHeight / window.innerWidth;
+            this.LOGIC_H = this.LOGIC_W * aspect;
+            
+            // 箱の高さは約932 (250〜1182)。画面中央になるようにYオフセットを計算
+            const boxH = 932;
+            const topPadding = (this.LOGIC_H - boxH) / 2;
+            this.LOGIC_OFFSET_Y = topPadding - 250; 
         } else {
             this.LOGIC_OFFSET_X = 0;
+            this.LOGIC_OFFSET_Y = 0;
             this.LOGIC_W = 1290;
+            this.LOGIC_H = 1092;
         }
         
-        this.LOGIC_H = 1092; 
         this.SCALE = 0.6; 
 
         this.canvas.width = this.LOGIC_W * this.SCALE;
@@ -94,7 +102,7 @@ class SinglePlayerGame {
         this.handleMouseClick = (e) => {
             const rect = this.canvas.getBoundingClientRect();
             const mouseX = ((e.clientX - rect.left) / rect.width) * this.LOGIC_W + this.LOGIC_OFFSET_X;
-            const mouseY = ((e.clientY - rect.top) / rect.height) * this.LOGIC_H;
+            const mouseY = ((e.clientY - rect.top) / rect.height) * this.LOGIC_H - (this.LOGIC_OFFSET_Y || 0);
 
             if(this.gameOver) {
                 // Restart button bounds: 730 <= x <= 1115 and 786 <= y <= 886
@@ -306,26 +314,31 @@ class SinglePlayerGame {
 
     drawUI(ctx) {
         if (this.mobileMode) {
-            // モバイル用簡易表示
-            ctx.font = "bold 40px Meiryo, sans-serif";
-            ctx.textAlign = "center";
+            ctx.font = "bold 38px Meiryo, sans-serif";
             ctx.fillStyle = "white";
             ctx.strokeStyle = "rgba(100,50,0,0.5)";
             ctx.lineWidth = 6;
             
-            const centerX = 907; // (560 + 1254) / 2
-            const topY = 100;
+            // 箱の上端 (250) よりさらに上の空きスペースに配置
+            const topY = 160; 
+            const leftX = 560; // 箱の左端
+            const rightX = 1254; // 箱の右端
             
-            ctx.strokeText("SCORE: " + this.score, centerX, topY);
-            ctx.fillText("SCORE: " + this.score, centerX, topY);
+            // スコアを左上に配置
+            ctx.textAlign = "left";
+            ctx.strokeText("SCORE: " + this.score, leftX, topY);
+            ctx.fillText("SCORE: " + this.score, leftX, topY);
 
+            // NEXTを右上に配置
+            ctx.textAlign = "right";
             const nextImg = ASSETS[FRUITS[this.nextNextFruitIdx].src];
             if(nextImg) {
                 const drawW = nextImg.width / 5;
                 const drawH = nextImg.height / 5;
-                ctx.drawImage(nextImg, centerX + 180, topY - 40, drawW, drawH);
-                ctx.strokeText("NEXT:", 907 + 110, topY);
-                ctx.fillText("NEXT:", 907 + 110, topY);
+                // 右端に画像、その左に「NEXT:」テキスト
+                ctx.strokeText("NEXT:", rightX - drawW - 10, topY);
+                ctx.fillText("NEXT:", rightX - drawW - 10, topY);
+                ctx.drawImage(nextImg, rightX - drawW, topY - 35, drawW, drawH);
             }
             return;
         }
@@ -502,7 +515,7 @@ class SinglePlayerGame {
         const ctx = this.ctx;
         ctx.save();
         ctx.scale(this.SCALE, this.SCALE);
-        ctx.translate(-this.LOGIC_OFFSET_X, 0);
+        ctx.translate(-this.LOGIC_OFFSET_X, this.LOGIC_OFFSET_Y || 0);
 
         // Draw background
         const season = window.bgSeason || 'spring';
@@ -531,14 +544,19 @@ class SinglePlayerGame {
                 if (wrappedIndex < 0) wrappedIndex += 6;
                 
                 let item = images[wrappedIndex];
+                
+                // モバイルで縦長になった場合は背景も縦に伸ばす
+                let drawH = this.mobileMode ? Math.max(1080, this.LOGIC_H) : 1080;
+                let bgY = this.mobileMode ? -(this.LOGIC_OFFSET_Y || 0) : 0;
+
                 if (item.flip) {
                     ctx.save();
-                    ctx.translate(drawX + W, 0);
+                    ctx.translate(drawX + W, bgY);
                     ctx.scale(-1, 1);
-                    ctx.drawImage(item.img, 0, 0, W, H);
+                    ctx.drawImage(item.img, 0, 0, W, drawH);
                     ctx.restore();
                 } else {
-                    ctx.drawImage(item.img, drawX, 0, W, H);
+                    ctx.drawImage(item.img, drawX, bgY, W, drawH);
                 }
             }
         } else {
